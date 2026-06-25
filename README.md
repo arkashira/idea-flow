@@ -1,20 +1,15 @@
-# Offline-First App
-
-This is a simple offline-first app that allows users to create boards and add ideas to them. The app works offline and syncs with a server when connectivity is restored.
+# Idea Flow
+Idea flow management system with team and permission management.
 
 ## Features
+* Assign roles to team members
+* Add ideas
+* View ideas
+* Edit ideas
 
-* Create boards and add ideas to them
-* Works offline and syncs with a server when connectivity is restored
-* Indicates offline status and sync progress
-
-## Requirements
-
-* Python 3.8 or later
-* pytest 6.2.5 or later
-
-## Running the App
-
-1. Install the required dependencies using `poetry install`
-2. Run the app using `python -m offline_first`
-3. Run the tests using `pytest`
+## Usage
+1. Create a new instance of the `IdeaFlow` class.
+2. Assign roles to team members using the `assign_role` method.
+3. Add ideas using the `add_idea` method.
+4. View ideas using the `view_ideas` method.
+5. Edit ideas using the `edit_idea` method.
