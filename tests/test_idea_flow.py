@@ -1,46 +1,51 @@
-from idea_flow import IdeaFlow, Role
 import pytest
+from idea_flow import IdeaFlow, Idea, Theme
 
-def test_assign_role():
+def test_create_theme():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.ADMIN)
-    assert idea_flow.team_members["John"].role == Role.ADMIN
+    theme = idea_flow.create_theme("Test Theme")
+    assert theme.id == 1
+    assert theme.name == "Test Theme"
+    assert theme.ideas == []
 
-def test_add_idea():
+def test_add_idea_to_theme():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.ADMIN)
-    idea_flow.add_idea("New idea", "John")
-    assert idea_flow.ideas == ["New idea"]
+    theme = idea_flow.create_theme("Test Theme")
+    idea = idea_flow.add_idea_to_theme(1, "Test Idea")
+    assert idea.id == 1
+    assert idea.text == "Test Idea"
+    assert theme.ideas == [idea]
 
-def test_view_ideas():
+def test_get_theme():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.ADMIN)
-    idea_flow.add_idea("New idea", "John")
-    idea_flow.assign_role("Jane", Role.VIEWER)
-    assert idea_flow.view_ideas("Jane") == ["New idea"]
+    theme = idea_flow.create_theme("Test Theme")
+    retrieved_theme = idea_flow.get_theme(1)
+    assert retrieved_theme == theme
 
-def test_edit_idea():
+def test_get_themes():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.ADMIN)
-    idea_flow.add_idea("New idea", "John")
-    idea_flow.edit_idea(0, "Updated idea", "John")
-    assert idea_flow.ideas == ["Updated idea"]
+    theme1 = idea_flow.create_theme("Test Theme 1")
+    theme2 = idea_flow.create_theme("Test Theme 2")
+    themes = idea_flow.get_themes()
+    assert themes == [theme1, theme2]
 
-def test_prohibited_action():
+def test_get_ideas_per_theme():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.VIEWER)
-    with pytest.raises(PermissionError):
-        idea_flow.add_idea("New idea", "John")
+    theme1 = idea_flow.create_theme("Test Theme 1")
+    idea_flow.add_idea_to_theme(1, "Test Idea 1")
+    theme2 = idea_flow.create_theme("Test Theme 2")
+    idea_flow.add_idea_to_theme(2, "Test Idea 2")
+    ideas_per_theme = idea_flow.get_ideas_per_theme()
+    assert ideas_per_theme == {1: 1, 2: 1}
 
-def test_role_change():
+def test_to_json():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.VIEWER)
-    idea_flow.assign_role("John", Role.ADMIN)
-    idea_flow.add_idea("New idea", "John")
-    assert idea_flow.ideas == ["New idea"]
+    theme = idea_flow.create_theme("Test Theme")
+    idea_flow.add_idea_to_theme(1, "Test Idea")
+    json_string = idea_flow.to_json()
+    assert json_string == '[{"id": 1, "name": "Test Theme", "ideas": [{"id": 1, "text": "Test Idea"}]}]'
 
-def test_403_error():
+def test_theme_not_found():
     idea_flow = IdeaFlow()
-    idea_flow.assign_role("John", Role.VIEWER)
-    with pytest.raises(PermissionError):
-        idea_flow.edit_idea(0, "Updated idea", "John")
+    with pytest.raises(ValueError):
+        idea_flow.add_idea_to_theme(1, "Test Idea")
